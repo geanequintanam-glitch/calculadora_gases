@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Científica de Gases</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen font-sans">
+
+    <header class="bg-slate-800 border-b border-slate-700 py-6 text-center shadow-md">
+        <h1 class="text-3xl font-extrabold text-emerald-400 tracking-wide">Laboratorio Virtual de Gases</h1>
+        <p class="text-slate-400 mt-2 text-sm">Resuelve ecuaciones de gases ideales, transformaciones y conversión de unidades</p>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-8 space-y-10">
+
+        <section class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">1. Ley de los Gases Ideales ($P \cdot V = n \cdot R \cdot T$)</h2>
+            <p class="text-sm text-slate-400 mb-6">Instrucciones: Rellena los 3 valores que conozcas en unidades estándar (atm, L, mol, K) y deja **vacío** el campo que deseas calcular.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Presión (P) [atm]</label>
+                    <input type="number" id="idealP" step="any" placeholder="Dejar vacío para calcular P" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Volumen (V) [L]</label>
+                    <input type="number" id="idealV" step="any" placeholder="Dejar vacío para calcular V" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Cantidad de sustancia (n) [moles]</label>
+                    <input type="number" id="idealN" step="any" placeholder="Dejar vacío para calcular n" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Temperatura (T) [K]</label>
+                    <input type="number" id="idealT" step="any" placeholder="Dejar vacío para calcular T" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+            </div>
+
+            <button onclick="calcularGasIdeal()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg transition shadow-md">
+                Calcular Incógnita
+            </button>
+
+            <div id="resultadoIdeal" class="mt-4 p-4 bg-slate-900 rounded-lg hidden border border-emerald-500/30"></div>
+        </section>
+
+        <section class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-xl font-bold text-emerald-400 mb-4 border-b border-slate-700 pb-2">2. Conversor Rápido de Presión</h2>
+            
+            <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Valor a convertir</label>
+                    <input type="number" id="presionInput" step="any" placeholder="Ej: 760" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                <div class="sm:w-1/3">
+                    <label class="block text-sm font-medium text-slate-300 mb-1">Unidad de origen</label>
+                    <select id="unidadOrigen" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <option value="atm">Atmósferas (atm)</option>
+                        <option value="mmhg">mmHg / Torr</option>
+                        <option value="kpa">Kilopascales (kPa)</option>
+                        <option value="psi">PSI</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="convertirPresion()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-6 py-2.5 rounded-lg transition shadow-md">
+                Convertir Unidades
+            </button>
+
+            <div id="resultadoPresion" class="mt-4 overflow-x-auto hidden">
+                <table class="w-full text-left border-collapse bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                    <thead>
+                        <tr class="bg-slate-750 text-emerald-400 text-sm border-b border-slate-700">
+                            <th class="p-3">Unidad</th>
+                            <th class="p-3">Equivalencia</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm divide-y divide-slate-800">
+                        <tr><td class="p-3 font-medium">Atmósferas</td><td id="resAtm" class="p-3 text-slate-300"></td></tr>
+                        <tr><td class="p-3 font-medium">mmHg / Torr</td><td id="resMmhg" class="p-3 text-slate-300"></td></tr>
+                        <tr><td class="p-3 font-medium">Kilopascales (kPa)</td><td id="resKpa" class="p-3 text-slate-300"></td></tr>
+                        <tr><td class="p-3 font-medium">PSI</td><td id="resPsi" class="p-3 text-slate-300"></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const R = 0.0821;
+
+        // 1. Lógica Ecuación Gas Ideal
+        function calcularGasIdeal() {
+            // Obtenemos los valores de la interfaz y los convertimos a números flotantes
+            let p = parseFloat(document.getElementById('idealP').value);
+            let v = parseFloat(document.getElementById('idealV').value);
+            let n = parseFloat(document.getElementById('idealN').value);
+            let t = parseFloat(document.getElementById('idealT').value);
+            
+            let resDiv = document.getElementById('resultadoIdeal');
+            resDiv.classList.remove('hidden');
+            
+            // Contamos cuántos campos están vacíos (NaN)
+            let vacios = [p, v, n, t].filter(val => isNaN(val)).length;
+
+            if (vacios !== 1) {
+                resDiv.innerHTML = `<span class="text-red-400 font-semibold">Error:</span> Debes dejar exactamente UN campo vacío para poder calcularlo.`;
+                return;
+            }
+
+            // Aplicamos los despejes de fórmulas idénticos a PSeInt
+            if (isNaN(p)) {
+                let resultado = (n * R * t) / v;
+                resDiv.innerHTML = `<p class="text-slate-300">La <strong>Presión (P)</strong> calculada es: <span class="text-emerald-400 font-bold text-lg">${resultado.toFixed(4)} atm</span></p>`;
+            } else if (isNaN(v)) {
+                let resultado = (n * R * t) / p;
+                resDiv.innerHTML = `<p class="text-slate-300">El <strong>Volumen (V)</strong> calculado es: <span class="text-emerald-400 font-bold text-lg">${resultado.toFixed(4)} L</span></p>`;
+            } else if (isNaN(n)) {
+                let resultado = (p * v) / (R * t);
+                resDiv.innerHTML = `<p class="text-slate-300">La cantidad de sustancia <strong>(n)</strong> es: <span class="text-emerald-400 font-bold text-lg">${resultado.toFixed(4)} moles</span></p>`;
+            } else if (isNaN(t)) {
+                let resultado = (p * v) / (n * R);
+                resDiv.innerHTML = `<p class="text-slate-300">La <strong>Temperatura (T)</strong> calculada es: <span class="text-emerald-400 font-bold text-lg">${resultado.toFixed(4)} K</span></p>`;
+            }
+        }
+
+        // 2. Lógica Conversor de Presión
+        function convertirPresion() {
+            let valor = parseFloat(document.getElementById('presionInput').value);
+            let origen = document.getElementById('unidadOrigen').value;
+            let tablaDiv = document.getElementById('resultadoPresion');
+
+            if (isNaN(valor)) {
+                alert("Por favor, ingresa un valor numérico válido.");
+                return;
+            }
+
+            let atm;
+            // Normalización a atmósferas
+            switch(origen) {
+                case 'atm': atm = valor; break;
+                case 'mmhg': atm = valor / 760; break;
+                case 'kpa': atm = valor / 101.325; break;
+                case 'psi': atm = valor / 14.7; break;
+            }
+
+            // Despliegue de datos calculados dinámicamente en la tabla HTML
+            document.getElementById('resAtm').innerText = atm.toFixed(4) + " atm";
+            document.getElementById('resMmhg').innerText = (atm * 760).toFixed(2) + " mmHg";
+            document.getElementById('resKpa').innerText = (atm * 101.325).toFixed(3) + " kPa";
+            document.getElementById('resPsi').innerText = (atm * 14.7).toFixed(2) + " psi";
+
+            tablaDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
